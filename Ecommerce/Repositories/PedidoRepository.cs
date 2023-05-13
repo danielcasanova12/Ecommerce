@@ -69,46 +69,120 @@ namespace Ecommerce.Repositories
 
         public void Remover(int id)
         {
-            using (var connection = new MySqlConnection(_connectionString))
+            try
             {
-                connection.Open();
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    connection.Open();
 
-                var query = "DELETE FROM tb_pedido WHERE PedidoId  = @Id";
-                var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Id", id);
+                    // Verifica se existem itens relacionados ao pedido
+                    var queryItens = "SELECT COUNT(*) FROM tb_pedido_itempedido WHERE PedidoId = @Id";
+                    var commandItens = new MySqlCommand(queryItens, connection);
+                    commandItens.Parameters.AddWithValue("@Id", id);
+                    var count = Convert.ToInt32(commandItens.ExecuteScalar());
 
-                command.ExecuteNonQuery();
+                    if (count > 0)
+                    {
+                        // Se existirem itens relacionados, lança uma exceção ou exibe uma mensagem de erro
+                        throw new Exception("Não é possível excluir o pedido porque existem itens relacionados a ele.");
+                    }
+                    else
+                    {
+                        // Se não existirem itens relacionados, executa a exclusão do pedido
+                        var query = "DELETE FROM tb_pedido WHERE PedidoId = @Id";
+                        var command = new MySqlCommand(query, connection);
+                        command.Parameters.AddWithValue("@Id", id);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
+
 
         public Pedido ObterPorId(int id)
         {
-            using (var connection = new MySqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                var query = "SELECT * FROM tb_pedido WHERE PedidoId  = @Id";
-                var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Id", id);
-
-                var reader = command.ExecuteReader();
-
-                if (reader.Read())
+           
+                using (var connection = new MySqlConnection(_connectionString))
                 {
-                    var pedido = new Pedido
+                    connection.Open();
+
+                    var query = "SELECT * FROM tb_pedido WHERE PedidoId  = @Id";
+                    var command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    var reader = command.ExecuteReader();
+
+                    if (reader.Read())
                     {
-                        Id = (int)reader["PedidoId"],
-                        DataPedido = (DateTime)reader["data_pedido"],
-                        Cliente = (string)reader["Cliente"],
-                        Status = (string)reader["status_pedido"]
-                    };
+                        var pedido = new Pedido
+                        {
+                            Id = (int)reader["PedidoId"],
+                            DataPedido = (DateTime)reader["data_pedido"],
+                            Cliente = (string)reader["Cliente"],
+                            Status = (string)reader["status_pedido"]
+                        };
 
-                    return pedido;
+                        return pedido;
+                    }
+                
                 }
+            return null;
 
-                return null;
-            }
         }
+        //public List<ItemPedido> ObterItensPorPedidoId(int pedidoId)
+        //{
+        //    using (var connection = new MySqlConnection(_connectionString))
+        //    {
+        //        connection.Open();
+
+        //        var query = "SELECT * FROM tb_itempedido WHERE PedidoId = @PedidoId";
+        //        var command = new MySqlCommand(query, connection);
+        //        command.Parameters.AddWithValue("@PedidoId", pedidoId);
+
+        //        var reader = command.ExecuteReader();
+
+        //        var itensPedido = new List<ItemPedido>();
+
+        //        while (reader.Read())
+        //        {
+        //            var itemPedido = new ItemPedido
+        //            {
+        //                Id = (int)reader["ItemPedidoId"],
+        //                Quantidade = (int)reader["Quantidade"],
+        //                Produto = _produtoRepository.ObterPorId((int)reader["ProdutoId"])
+        //            };
+
+        //            itensPedido.Add(itemPedido);
+        //        }
+
+        //        reader.Close();
+
+        //        return itensPedido;
+        //    }
+        //}
+        public decimal calcularValorTotalDoPedido(int pedidoId)
+        {
+            decimal valorTotal = 0;
+            using (MySqlConnection conexao = new MySqlConnection(_connectionString))
+            {
+                conexao.Open();
+                MySqlCommand comando = new MySqlCommand("SELECT SUM(ip.quantidade * p.preco) FROM tb_itempedido ip JOIN tb_produto p ON ip.ProdutoId = p.ProdutoId WHERE ip.PedidoId = @PedidoId", conexao);
+                comando.Parameters.AddWithValue("@PedidoId", pedidoId);
+                object resultado = comando.ExecuteScalar();
+                if (resultado != DBNull.Value)
+                {
+                    valorTotal = Convert.ToDecimal(resultado);
+                }
+            }
+            return valorTotal;
+        }
+
+
 
         public List<Pedido> ObterTodos()
         {
@@ -150,9 +224,8 @@ namespace Ecommerce.Repositories
                     connection.Open();
                     
                     var query = "SELECT * FROM tb_pedido WHERE Cliente = @cliente";
-                Console.WriteLine(query);
-                var command = new MySqlCommand(query, connection);
-                    Console.WriteLine(query);
+                    var command = new MySqlCommand(query, connection);
+
                     command.Parameters.AddWithValue("@Cliente", cliente);
 
                     var reader = command.ExecuteReader();
@@ -219,7 +292,7 @@ namespace Ecommerce.Repositories
             {
                 connection.Open();
 
-                var query = "SELECT * FROM Pedido WHERE data_pedido BETWEEN @DataInicio AND @DataFim";
+                var query = "SELECT * FROM tb_pedido WHERE data_pedido BETWEEN @DataInicio AND @DataFim";
                 var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@DataInicio", data);
                 command.Parameters.AddWithValue("@DataFim", data2);
@@ -253,9 +326,8 @@ namespace Ecommerce.Repositories
 
                 var query = "INSERT INTO ItemPedido (ProdutoId, Quantidade, PrecoUnitario, PedidoId) VALUES (@ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId)";
                 var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.Id);
+                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.ProdutoId);
                 command.Parameters.AddWithValue("@Quantidade", itemPedido.Quantidade);
-                command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.PrecoUnitario);
                 command.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.Id);
 
                 command.ExecuteNonQuery();
@@ -285,7 +357,7 @@ namespace Ecommerce.Repositories
             using var connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            var query = "SELECT nome, preco FROM produto WHERE id = @produtoId";
+            var query = "SELECT nome, preco FROM tb_produto WHERE ProdutoId  = @produtoId";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@produtoId", produtoId);
 
@@ -294,7 +366,7 @@ namespace Ecommerce.Repositories
             {
                 return new Produto
                 {
-                    Id = produtoId,
+                    ProdutoId = produtoId,
                     Nome = reader.GetString("nome"),
                     Preco = reader.GetDecimal("preco")
                 };
@@ -323,9 +395,8 @@ namespace Ecommerce.Repositories
                     var item = new ItemPedido
                     {
                         Id = (int)reader["ItemPedidoId"],
-                        Produto = new Produto { Id = (int)reader["ProdutoId"] },
-                        Quantidade = (int)reader["quantidade"],
-                        PrecoUnitario = (decimal)reader["preco_unitario"]
+                        Produto = new Produto { ProdutoId = (int)reader["ProdutoId"] },
+                        Quantidade = (int)reader["quantidade"]
                     };
 
                     itens.Add(item);

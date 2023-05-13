@@ -23,23 +23,14 @@ namespace Ecommerce.Repositories
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-
-                var query = "INSERT INTO tb_itempedido (ProdutoId, Quantidade, PrecoUnitario, PedidoId) VALUES (@ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId); SELECT CAST(SCOPE_IDENTITY() as int)";
+                var query = "INSERT INTO tb_itempedido (ItemPedidoId, ProdutoId, Quantidade, preco_unitario, PedidoId) VALUES (@ItemPedidoId, @ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId);";
                 var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.Id);
+                command.Parameters.AddWithValue("@ItemPedidoId", itemPedido.Id);
+                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.ProdutoId);
                 command.Parameters.AddWithValue("@Quantidade", itemPedido.Quantidade);
-                command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.PrecoUnitario);
+                command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.Produto.Preco);
                 command.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.Id);
-
-                var id = (int)command.ExecuteScalar();
-                itemPedido.Id = id;
-
-                // Adiciona a relação entre o pedido e o itempedido na tabela de pedido_itempedido
-                var pedidoItemPedidoQuery = "INSERT INTO tb_pedido_itempedido (PedidoId, ItemPedidoId) VALUES (@PedidoId, @ItemPedidoId)";
-                var pedidoItemPedidoCommand = new MySqlCommand(pedidoItemPedidoQuery, connection);
-                pedidoItemPedidoCommand.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.Id);
-                pedidoItemPedidoCommand.Parameters.AddWithValue("@ItemPedidoId", id);
-                pedidoItemPedidoCommand.ExecuteNonQuery();
+                command.ExecuteNonQuery();
             }
         }
 
@@ -51,15 +42,15 @@ namespace Ecommerce.Repositories
 
                 var query = "UPDATE ItemPedido SET ProdutoId = @ProdutoId, Quantidade = @Quantidade, PrecoUnitario = @PrecoUnitario, PedidoId = @PedidoId WHERE Id = @Id";
                 var command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.Id);
+                command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.ProdutoId);
                 command.Parameters.AddWithValue("@Quantidade", itemPedido.Quantidade);
-                command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.PrecoUnitario);
                 command.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.Id);
                 command.Parameters.AddWithValue("@Id", itemPedido.Id);
 
                 command.ExecuteNonQuery();
             }
         }
+
 
         public void Remover(int id)
         {
@@ -92,9 +83,8 @@ namespace Ecommerce.Repositories
                     var itemPedido = new ItemPedido
                     {
                         Id = (int)reader["Id"],
-                        Produto = new Produto { Id = (int)reader["ProdutoId"] },
+                        Produto = new Produto { ProdutoId = (int)reader["ProdutoId"] },
                         Quantidade = (int)reader["Quantidade"],
-                        PrecoUnitario = (decimal)reader["PrecoUnitario"],
                         Pedido = new Pedido { Id = (int)reader["PedidoId"] }
                     };
 
@@ -123,9 +113,8 @@ namespace Ecommerce.Repositories
                     var itemPedido = new ItemPedido
                     {
                         Id = (int)reader["Id"],
-                        Produto = new Produto { Id = (int)reader["ProdutoId"] },
+                        Produto = new Produto { ProdutoId = (int)reader["ProdutoId"] },
                         Quantidade = (int)reader["Quantidade"],
-                        PrecoUnitario = (decimal)reader["PrecoUnitario"],
                         Pedido = new Pedido { Id = (int)reader["PedidoId"] }
                     };
 

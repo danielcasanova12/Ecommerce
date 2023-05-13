@@ -29,8 +29,6 @@ namespace Ecommerce.UI
             var produtoId = int.Parse(Console.ReadLine());
             Console.WriteLine("Digite a quantidade:");
             var quantidade = int.Parse(Console.ReadLine());
-            Console.WriteLine("Digite o preço unitário:");
-            var precoUnitario = decimal.Parse(Console.ReadLine());
 
             var pedido = _gerenciamentoDePedidos.BuscarPorID(pedidoId);
             var produto = _gerenciamentoDePedidos.ObterProdutoPorId(produtoId);
@@ -39,8 +37,7 @@ namespace Ecommerce.UI
             {
                 Pedido = pedido,
                 Produto = produto,
-                Quantidade = quantidade,
-                PrecoUnitario = precoUnitario
+                Quantidade = quantidade
             };
 
             _gerenciamentoDePedidos.AdicionarItemPedido(novoItemPedido);

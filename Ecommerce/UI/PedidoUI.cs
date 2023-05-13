@@ -17,71 +17,6 @@ namespace Ecommerce.UI
             this._gerenciador = gerenciamentoDePedidos;
         }
 
-        //public void MostrarMenu()
-        //{
-        //    while (true)
-        //    {
-        //        Console.WriteLine("Selecione uma opção:");
-        //        Console.WriteLine("1. Criar um novo pedido");
-        //        Console.WriteLine("2. Adicionar itens a um pedido");
-        //        Console.WriteLine("3. Atualizar o status de um pedido");
-        //        Console.WriteLine("4. Remover um pedido");
-        //        Console.WriteLine("5. Listar pedidos por cliente, status ou data");
-        //        Console.WriteLine("6. Calcular o valor total de um pedido");
-        //        Console.WriteLine("0. Sair");
-
-        //        var opcao = Console.ReadLine();
-
-        //        switch (opcao)
-        //        {
-        //            case "1":
-        //                CriarPedido();
-        //                break;
-        //            case "2":
-        //                AdicionarItensAoPedido();
-        //                break;
-        //            case "3":
-        //                AtualizarStatusPedido();
-        //                break;
-        //            case "4":
-        //                RemoverPedido();
-        //                break;
-        //            case "5":
-        //                Console.WriteLine("Selecione uma opção:");
-        //                Console.WriteLine("1. Listar por cliente");
-        //                Console.WriteLine("2. Listar por status");
-        //                Console.WriteLine("3. Listar por data");
-        //                var opcaoListagem = Console.ReadLine();
-        //                switch (opcaoListagem)
-        //                {
-        //                    case "1":
-        //                        ListarPedidosPorCliente();
-        //                        break;
-        //                    case "2":
-        //                        ListarPedidosPorStatus();
-        //                        break;
-        //                    case "3":
-        //                        ListarPedidosPorData();
-        //                        break;
-        //                    default:
-        //                        Console.WriteLine("Opção inválida. Tente novamente.");
-        //                        break;
-        //                }
-        //                break;
-        //            case "6":
-        //                CalcularValorTotalPedido();
-        //                break;
-        //            case "0":
-        //                return;
-        //            default:
-        //                Console.WriteLine("Opção inválida. Tente novamente.");
-        //                break;
-        //        }
-
-        //        Console.WriteLine();
-        //    }
-        //}
-
         public void ChamarCriarPedido()
         {
             CriarPedido();
@@ -98,13 +33,17 @@ namespace Ecommerce.UI
         {
             ListarPedidosPorCliente();
         }
-        public void ChamarRemoverPedido()
+        public void ChamarListarPedidosPorStatus()
         {
-            RemoverPedido();
+            ListarPedidosPorStatus();
         }
-        public void ChamarRemoverPedido()
+        public void ChamarListarPedidosPorData()
         {
-            RemoverPedido();
+            ListarPedidosPorData();
+        }
+        public void ChamarCalcularValorTotalPedido()
+        {
+            CalcularValorTotalPedido();
         }
 
         private void CriarPedido()
@@ -138,7 +77,6 @@ namespace Ecommerce.UI
             int id = int.Parse(Console.ReadLine());
 
             _gerenciador.RemoverPedido(id);
-            Console.WriteLine("Pedido removido com sucesso!");
         }
 
         private void ListarPedidosPorCliente()
@@ -181,10 +119,17 @@ namespace Ecommerce.UI
 
         private void ListarPedidosPorData()
         {
-            Console.WriteLine("Digite a data inicial (dd/MM/yyyy):");
+            DateTime exemploData = new DateTime(2023, 06, 01);
+            Console.WriteLine($"Digite a data inicial no formato dd/MM/yyyy (exemplo: {exemploData.ToString("dd/MM/yyyy")}):");
             DateTime dataInicial = DateTime.Parse(Console.ReadLine());
             Console.WriteLine("Digite a data final (dd/MM/yyyy):");
             DateTime dataFinal = DateTime.Parse(Console.ReadLine());
+
+            if (dataFinal < dataInicial)
+            {
+                Console.WriteLine("A data final deve ser posterior à data inicial.");
+                return;
+            }
 
             var pedidos = _gerenciador.ListarPedidosPorData(dataInicial, dataFinal);
             if (pedidos.Count == 0)
@@ -198,6 +143,7 @@ namespace Ecommerce.UI
             {
                 Console.WriteLine($"ID: {pedido.Id} | Cliente: {pedido.Cliente} | Status: {pedido.Status}");
             }
+
         }
 
         private void CalcularValorTotalPedido()

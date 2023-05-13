@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Repositories;
 using Ecommerce.Services;
 using Ecommerce.UI;
+using Ecommerce.IniciarDataBase;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 
@@ -10,6 +11,7 @@ namespace Ecommerce
     {
         static void Main(string[] args)
         {
+
             var connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
             var services = new ServiceCollection();
@@ -22,7 +24,8 @@ namespace Ecommerce
             var gerenciamentoDePedidos =  serviceProvider.GetService<GerenciamentoDePedidos>();
             var pedidoUI = new PedidoUI(gerenciamentoDePedidos);
             var itenspedidoUI = new ItemPedidoUI(gerenciamentoDePedidos);
-
+            IniciarDataBase.IniciarDataBase db = new IniciarDataBase.IniciarDataBase(connectionString);
+            db.CriarDb();
             while (true)
             {
                 Console.WriteLine("Selecione uma opção:");

@@ -64,14 +64,7 @@ namespace Ecommerce.Services
 
         public decimal CalcularValorTotalPedido(int pedidoId)
         {
-            var pedido = _pedidoRepository.ObterPorId(pedidoId);
-
-            if (pedido != null)
-            {
-                return pedido.Itens.Sum(i => i.Quantidade * i.PrecoUnitario);
-            }
-
-            return 0;
+            return _pedidoRepository.calcularValorTotalDoPedido( pedidoId);
         }
         public Pedido BuscarPorID(int id)
         {

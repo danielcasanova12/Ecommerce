@@ -11,7 +11,7 @@ namespace Ecommerce.Models
         public int Id { get; set; }
         public Produto Produto { get; set; }
         public int Quantidade { get; set; }
-        public decimal PrecoUnitario { get; set; }
+        public int preco_unitario { get; set; }
         public Pedido Pedido { get; set; }
     }
 }
