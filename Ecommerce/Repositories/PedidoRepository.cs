@@ -279,6 +279,31 @@ namespace Ecommerce.Repositories
         //    }
         //}
 
+
+        public Produto ObterProduto(int produtoId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            var query = "SELECT nome, preco FROM produto WHERE id = @produtoId";
+            using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@produtoId", produtoId);
+
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Produto
+                {
+                    Id = produtoId,
+                    Nome = reader.GetString("nome"),
+                    Preco = reader.GetDecimal("preco")
+                };
+            }
+            else
+            {
+                throw new Exception($"Produto com ID {produtoId} não encontrado.");
+            }
+        }
         private List<ItemPedido> ObterItensPorPedido(int pedidoId)
         {
             using (var connection = new MySqlConnection(_connectionString))

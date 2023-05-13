@@ -9,7 +9,7 @@ namespace Ecommerce.Repositories
 {
     public interface IItemPedidoRepository
     {
-        void Adicionar(ItemPedido itemPedido);
+        void AdicionarItem(ItemPedido itemPedido);
         void Atualizar(ItemPedido itemPedido);
         void Remover(int id);
         ItemPedido ObterPorId(int id);

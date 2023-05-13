@@ -13,9 +13,11 @@ namespace Ecommerce.Repositories
         void Atualizar(Pedido pedido);
         void Remover(int id);
         Pedido ObterPorId(int id);
+        Produto ObterProduto(int id);
         List<Pedido> ObterTodos();
         List<Pedido> ObterPorCliente(string cliente);
         List<Pedido> ObterPorStatus(string status);
         List<Pedido> ObterPorData(DateTime data, DateTime data2);
+        
     }
 }

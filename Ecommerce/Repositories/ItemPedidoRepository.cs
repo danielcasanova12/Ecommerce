@@ -18,7 +18,7 @@ namespace Ecommerce.Repositories
             _connectionString = connectionString;
         }
 
-        public void Adicionar(ItemPedido itemPedido)
+        public void AdicionarItem(ItemPedido itemPedido)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
@@ -33,13 +33,12 @@ namespace Ecommerce.Repositories
 
                 var id = (int)command.ExecuteScalar();
                 itemPedido.Id = id;
-                var itemPedidoId = (int)itemPedidoCommand.LastInsertedId;
 
                 // Adiciona a relação entre o pedido e o itempedido na tabela de pedido_itempedido
                 var pedidoItemPedidoQuery = "INSERT INTO tb_pedido_itempedido (PedidoId, ItemPedidoId) VALUES (@PedidoId, @ItemPedidoId)";
                 var pedidoItemPedidoCommand = new MySqlCommand(pedidoItemPedidoQuery, connection);
-                pedidoItemPedidoCommand.Parameters.AddWithValue("@PedidoId", pedidoId);
-                pedidoItemPedidoCommand.Parameters.AddWithValue("@ItemPedidoId", itemPedidoId);
+                pedidoItemPedidoCommand.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.Id);
+                pedidoItemPedidoCommand.Parameters.AddWithValue("@ItemPedidoId", id);
                 pedidoItemPedidoCommand.ExecuteNonQuery();
             }
         }

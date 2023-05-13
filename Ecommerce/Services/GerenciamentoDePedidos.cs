@@ -1,5 +1,7 @@
 ﻿using Ecommerce.Models;
 using Ecommerce.Repositories;
+using Ecommerce.UI;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,7 @@ namespace Ecommerce.Services
 
         public void AdicionarItemPedido(ItemPedido itemPedido)
         {
-            _itemPedidoRepository.Adicionar(itemPedido);
+            _itemPedidoRepository.AdicionarItem(itemPedido);
         }
 
         public void AtualizarStatusPedido(int pedidoId, string status)
@@ -70,6 +72,14 @@ namespace Ecommerce.Services
             }
 
             return 0;
+        }
+        public Pedido BuscarPorID(int id)
+        {
+            return _pedidoRepository.ObterPorId(id);
+        }
+        public Produto ObterProdutoPorId(int id)
+        {
+            return _pedidoRepository.ObterProduto(id);
         }
     }
 
