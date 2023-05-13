@@ -1,35 +1,53 @@
-﻿//using Ecommerce.Repositories;
-//using Ecommerce.Services;
+﻿//using System;
+//using Ecommerce.Models;
+//using Ecommerce.Repositories;
 //using System.Configuration;
-//using Microsoft.Extensions.DependencyInjection;
+//using System.Data.SqlClient;
+//using Ecommerce.Services;
+//using MySql.Data.MySqlClient;
 
-//namespace Ecommerce
+//class Program
 //{
-//    class Program
+//    static void Main(string[] args)
 //    {
-//        static void Main(string[] args)
+
+//        var connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+//        string query = "SELECT * FROM tb_usuario";
+//        var gerenciamentoDePedidos = new GerenciamentoDePedidos(new PedidoRepository(connectionString), new ItemPedidoRepository(connectionString));
+//        using (MySqlConnection connection = new MySqlConnection(connectionString))
 //        {
-//            // Obtém a string de conexão do arquivo de configuração
-//            var connectionString = ConfigurationManager.ConnectionStrings["NomeDaConnectionString"].ConnectionString;
+//            MySqlCommand command = new MySqlCommand(query, connection);
+//            connection.Open();
 
-//            // Configura o ServiceCollection
-//            var services = new ServiceCollection();
+//            MySqlDataReader reader = command.ExecuteReader();
 
-//            services.AddTransient<IPedidoRepository>(provider => new PedidoRepository(connectionString));
-//            services.AddTransient<IItemPedidoRepository>(provider => new ItemPedidoRepository(connectionString));
-//            services.AddTransient<GerenciamentoDePedidos>();
+//            while (reader.Read())
+//            {
+//                Console.WriteLine("{0}\t{1}\t{2}", reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+//            }
 
-//            var serviceProvider = services.BuildServiceProvider();
+//            reader.Close();
 
-//            var gerenciamentoDePedidos = serviceProvider.GetService<GerenciamentoDePedidos>();
 //        }
+//        var novoPedido = new Pedido
+//        {
+//            Id = 1,
+//            Cliente = "SAD",
+//            Status = "SADASD",
+//            DataPedido = DateTime.Now,
+//            Itens = new List<ItemPedido>()
+//        };
+//        gerenciamentoDePedidos.CriarPedido(novoPedido);
 //    }
 //}
+
+
 using Ecommerce.Models;
 using Ecommerce.Repositories;
 using Ecommerce.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Configuration;
 
 namespace Ecommerce
 {
@@ -37,8 +55,19 @@ namespace Ecommerce
     {
         static void Main(string[] args)
         {
+            var connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+
+            // Configura o ServiceCollection
+            var services = new ServiceCollection();
+
+            services.AddTransient<IPedidoRepository>(provider => new PedidoRepository(connectionString));
+            services.AddTransient<IItemPedidoRepository>(provider => new ItemPedidoRepository(connectionString));
+            services.AddTransient<GerenciamentoDePedidos>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var gerenciamentoDePedidos =  serviceProvider.GetService<GerenciamentoDePedidos>();
             // Configura o ServiceCollection e obtém uma instância do GerenciamentoDePedidos
-            var gerenciamentoDePedidos = ConfigurarGerenciamentoDePedidos();
+           
 
             // Loop principal do menu
             while (true)
@@ -59,25 +88,37 @@ namespace Ecommerce
                     case "1":
                         Console.WriteLine("Digite o nome do cliente:");
                         var nomeCliente = Console.ReadLine();
-                        var novoPedido = new Pedido(nomeCliente);
+                        var novoPedido = new Pedido
+                        {
+                            Cliente = "SAD",
+                            Status = "SADASD",
+                            DataPedido = DateTime.Now,
+                            Itens = new List<ItemPedido>()
+                        };
                         gerenciamentoDePedidos.CriarPedido(novoPedido);
                         break;
                     case "2":
                         Console.WriteLine("Digite o ID do pedido:");
                         var pedidoId = int.Parse(Console.ReadLine());
                         Console.WriteLine("Digite o ID do produto:");
-                        Console.WriteLine("Digite o ID do produto:");
                         var produtoId = int.Parse(Console.ReadLine());
                         Console.WriteLine("Digite a quantidade:");
                         var quantidade = int.Parse(Console.ReadLine());
-                        gerenciamentoDePedidos.AdicionarItemAoPedido(pedidoId, produtoId, quantidade);
+
+                    //    var itemPedido = new ItemPedido
+                      //  {
+                           // Produto = pedidoId,
+                       //     Quantidade = quantidade,    
+                          //  PrecoUnitario = 55
+                       // }
+                        //gerenciamentoDePedidos.AdicionarItemAoPedido(itemPedido);
                         break;
                     case "3":
                         Console.WriteLine("Digite o ID do pedido:");
                         pedidoId = int.Parse(Console.ReadLine());
                         Console.WriteLine("Digite o novo status:");
                         var novoStatus = Console.ReadLine();
-                        gerenciamentoDePedidos.AtualizarStatusDoPedido(pedidoId, novoStatus);
+                        gerenciamentoDePedidos.AtualizarStatusPedido(pedidoId, novoStatus);
                         break;
                     case "4":
                         Console.WriteLine("Digite o ID do pedido:");
@@ -95,19 +136,34 @@ namespace Ecommerce
                             case "1":
                                 Console.WriteLine("Digite o nome do cliente:");
                                 var cliente = Console.ReadLine();
-                                gerenciamentoDePedidos.ListarPedidosPorCliente(cliente);
+                                var lista = gerenciamentoDePedidos.ListarPedidosPorCliente(cliente);
+                                foreach (var item in lista)
+                                {
+                                    Console.WriteLine(item.Id);
+                                    Console.WriteLine(item.Cliente);
+                                }
                                 break;
                             case "2":
                                 Console.WriteLine("Digite o status:");
                                 var status = Console.ReadLine();
-                                gerenciamentoDePedidos.ListarPedidosPorStatus(status);
+                                 lista = gerenciamentoDePedidos.ListarPedidosPorStatus(status);
+                                foreach (var item in lista)
+                                {
+                                    Console.WriteLine(item.Id);
+                                    Console.WriteLine(item.Cliente);
+                                }
                                 break;
                             case "3":
                                 Console.WriteLine("Digite a data inicial (yyyy-MM-dd):");
                                 var dataInicial = DateTime.Parse(Console.ReadLine());
                                 Console.WriteLine("Digite a data final (yyyy-MM-dd):");
                                 var dataFinal = DateTime.Parse(Console.ReadLine());
-                                gerenciamentoDePedidos.ListarPedidosPorData(dataInicial, dataFinal);
+                                 lista = gerenciamentoDePedidos.ListarPedidosPorData(dataInicial, dataFinal);
+                                foreach (var item in lista)
+                                {
+                                    Console.WriteLine(item.Id);
+                                    Console.WriteLine(item.Cliente);
+                                }
                                 break;
                             default:
                                 Console.WriteLine("Opção inválida. Tente novamente.");
@@ -117,7 +173,7 @@ namespace Ecommerce
                     case "6":
                         Console.WriteLine("Digite o ID do pedido:");
                         pedidoId = int.Parse(Console.ReadLine());
-                        gerenciamentoDePedidos.CalcularValorTotalDoPedido(pedidoId);
+                        gerenciamentoDePedidos.CalcularValorTotalPedido(pedidoId);
                         break;
                     case "0":
                         return;
@@ -130,20 +186,6 @@ namespace Ecommerce
             }
         }
 
-        static GerenciamentoDePedidos ConfigurarGerenciamentoDePedidos()
-        {
-            // Obtém a string de conexão do arquivo de configuração
-            var connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
-            // Configura o ServiceCollection
-            var services = new ServiceCollection();
-
-            services.AddTransient<IPedidoRepository>(provider => new PedidoRepository(connectionString));
-            services.AddTransient<IItemPedidoRepository>(provider => new ItemPedidoRepository(connectionString));
-            services.AddTransient<GerenciamentoDePedidos>();
-
-            var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetService<GerenciamentoDePedidos>();
-        }
     }
 }

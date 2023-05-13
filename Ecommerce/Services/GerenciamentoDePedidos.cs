@@ -32,7 +32,6 @@ namespace Ecommerce.Services
         public void AtualizarStatusPedido(int pedidoId, string status)
         {
             var pedido = _pedidoRepository.ObterPorId(pedidoId);
-
             if (pedido != null)
             {
                 pedido.Status = status;
@@ -55,10 +54,11 @@ namespace Ecommerce.Services
             return _pedidoRepository.ObterPorStatus(status);
         }
 
-        public List<Pedido> ListarPedidosPorData(DateTime data)
+        public List<Pedido> ListarPedidosPorData(DateTime dataInicio, DateTime dataFim)
         {
-            return _pedidoRepository.ObterPorData(data);
+            return _pedidoRepository.ObterPorData(dataInicio, dataFim);
         }
+
 
         public decimal CalcularValorTotalPedido(int pedidoId)
         {

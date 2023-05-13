@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Models;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -19,12 +20,12 @@ namespace Ecommerce.Repositories
 
         public void Adicionar(ItemPedido itemPedido)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
-                var query = "INSERT INTO ItemPedido (ProdutoId, Quantidade, PrecoUnitario, PedidoId) VALUES (@ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId); SELECT CAST(SCOPE_IDENTITY() as int)";
-                var command = new SqlCommand(query, connection);
+                var query = "INSERT INTO tb_itempedido (ProdutoId, Quantidade, PrecoUnitario, PedidoId) VALUES (@ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId); SELECT CAST(SCOPE_IDENTITY() as int)";
+                var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.Id);
                 command.Parameters.AddWithValue("@Quantidade", itemPedido.Quantidade);
                 command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.PrecoUnitario);
@@ -32,6 +33,14 @@ namespace Ecommerce.Repositories
 
                 var id = (int)command.ExecuteScalar();
                 itemPedido.Id = id;
+                var itemPedidoId = (int)itemPedidoCommand.LastInsertedId;
+
+                // Adiciona a relação entre o pedido e o itempedido na tabela de pedido_itempedido
+                var pedidoItemPedidoQuery = "INSERT INTO tb_pedido_itempedido (PedidoId, ItemPedidoId) VALUES (@PedidoId, @ItemPedidoId)";
+                var pedidoItemPedidoCommand = new MySqlCommand(pedidoItemPedidoQuery, connection);
+                pedidoItemPedidoCommand.Parameters.AddWithValue("@PedidoId", pedidoId);
+                pedidoItemPedidoCommand.Parameters.AddWithValue("@ItemPedidoId", itemPedidoId);
+                pedidoItemPedidoCommand.ExecuteNonQuery();
             }
         }
 

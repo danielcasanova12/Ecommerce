@@ -16,6 +16,6 @@ namespace Ecommerce.Repositories
         List<Pedido> ObterTodos();
         List<Pedido> ObterPorCliente(string cliente);
         List<Pedido> ObterPorStatus(string status);
-        List<Pedido> ObterPorData(DateTime data);
+        List<Pedido> ObterPorData(DateTime data, DateTime data2);
     }
 }
