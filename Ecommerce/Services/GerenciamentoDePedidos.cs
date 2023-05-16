@@ -30,7 +30,10 @@ namespace Ecommerce.Services
         {
             _itemPedidoRepository.AdicionarItem(itemPedido);
         }
-
+        public void ObterProdutos()
+        {
+            _pedidoRepository.ObterTodosProdutos();
+        }
         public void AtualizarStatusPedido(int pedidoId, string status)
         {
             var pedido = _pedidoRepository.ObterPorId(pedidoId);

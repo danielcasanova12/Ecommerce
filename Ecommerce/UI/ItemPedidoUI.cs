@@ -20,27 +20,43 @@ namespace Ecommerce.UI
         {
             AdicionarItemAoPedido();
         }
-
+        private void ListarProdutos()
+        {
+            _gerenciamentoDePedidos.ObterProdutos();
+        }
         public void AdicionarItemAoPedido()
         {
-            Console.WriteLine("Digite o ID do pedido:");
-            var pedidoId = int.Parse(Console.ReadLine());
-            Console.WriteLine("Digite o ID do produto:");
-            var produtoId = int.Parse(Console.ReadLine());
-            Console.WriteLine("Digite a quantidade:");
-            var quantidade = int.Parse(Console.ReadLine());
-
-            var pedido = _gerenciamentoDePedidos.BuscarPorID(pedidoId);
-            var produto = _gerenciamentoDePedidos.ObterProdutoPorId(produtoId);
-
-            var novoItemPedido = new ItemPedido
+            try
             {
-                Pedido = pedido,
-                Produto = produto,
-                Quantidade = quantidade
-            };
+                ListarProdutos();
+                Console.WriteLine("Digite o ID do pedido:");
+                var pedidoId = int.Parse(Console.ReadLine());
+                Console.WriteLine("Digite o ID do produto:");
+                var produtoId = int.Parse(Console.ReadLine());
+                Console.WriteLine("Digite a quantidade:");
+                var quantidade = int.Parse(Console.ReadLine());
 
-            _gerenciamentoDePedidos.AdicionarItemPedido(novoItemPedido);
+                var pedido = _gerenciamentoDePedidos.BuscarPorID(pedidoId);
+                var produto = _gerenciamentoDePedidos.ObterProdutoPorId(produtoId);
+
+
+                var novoItemPedido = new ItemPedido
+                {
+                    Pedido = pedido,
+                    Produto = produto,
+                    Quantidade = quantidade
+                };
+                Console.Clear();
+                _gerenciamentoDePedidos.AdicionarItemPedido(novoItemPedido);
+                Console.WriteLine("Pedido adicionado");
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("id não encontrado");
+                AdicionarItemAoPedido();
+                
+            }
         }
 
         //public void AtualizarItemPedido()

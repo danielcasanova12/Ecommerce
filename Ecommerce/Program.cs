@@ -42,19 +42,24 @@ namespace Ecommerce
                 switch (opcao)
                 {
                     case "1":
+                        Console.Clear();
                         pedidoUI.ChamarCriarPedido();
                         break;
                     case "2":
+                        Console.Clear();
                         itenspedidoUI.ChamarAdicionarItensPedido();
                         
                         break;
                     case "3":
+                        Console.Clear();
                         pedidoUI.ChamarAtualizarStatusPedido();
                         break;
                     case "4":
+                        Console.Clear();
                         pedidoUI.ChamarRemoverPedido();
                         break;
                     case "5":
+                        Console.Clear();
                         Console.WriteLine("Selecione uma opção:");
                         Console.WriteLine("1. Listar por cliente");
                         Console.WriteLine("2. Listar por status");
@@ -63,12 +68,15 @@ namespace Ecommerce
                         switch (opcaoListagem)
                         {
                             case "1":
+                                Console.Clear();
                                 pedidoUI.ChamarListarPedidosPorCliente();
                                 break;
                             case "2":
+                                Console.Clear();
                                 pedidoUI.ChamarListarPedidosPorStatus();
                                 break;
                             case "3":
+                                Console.Clear();
                                 pedidoUI.ChamarListarPedidosPorData();
                                 break;
                             default:
@@ -77,6 +85,7 @@ namespace Ecommerce
                         }
                         break;
                     case "6":
+                        Console.Clear();
                         pedidoUI.ChamarCalcularValorTotalPedido();
                         break;
                     case "0":

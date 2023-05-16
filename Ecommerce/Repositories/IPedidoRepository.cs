@@ -19,6 +19,7 @@ namespace Ecommerce.Repositories
         List<Pedido> ObterPorStatus(string status);
         List<Pedido> ObterPorData(DateTime data, DateTime data2);
         decimal calcularValorTotalDoPedido(int pedidoId);
+        List<Produto> ObterTodosProdutos();
 
 
     }

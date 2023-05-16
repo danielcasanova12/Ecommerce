@@ -50,10 +50,13 @@ namespace Ecommerce.UI
         {
             Console.WriteLine("Digite o nome do cliente:");
             var nomeCliente = Console.ReadLine();
+            Console.WriteLine("Digite o status do pedido:");
+            var statusPedido = Console.ReadLine();
+
             var novoPedido = new Pedido
             {
                 Cliente = nomeCliente,
-                Status = "Em aberto",
+                Status = statusPedido,
                 DataPedido = DateTime.Now,
                 Itens = new List<ItemPedido>()
             };
@@ -64,19 +67,39 @@ namespace Ecommerce.UI
 
         private void AtualizarStatusPedido()
         {
-            Console.WriteLine("Digite o ID do pedido:");
-            var pedidoId = int.Parse(Console.ReadLine());
-            Console.WriteLine("Digite o novo status:");
-            var novoStatus = Console.ReadLine();
-            _gerenciador.AtualizarStatusPedido(pedidoId, novoStatus);
-            Console.WriteLine("Status do pedido atualizado com sucesso.");
+            try
+            {
+                Console.WriteLine("Digite o ID do pedido:");
+                var pedidoId = int.Parse(Console.ReadLine());
+                Console.WriteLine("Digite o novo status:");
+                var novoStatus = Console.ReadLine();
+                _gerenciador.AtualizarStatusPedido(pedidoId, novoStatus);
+                Console.WriteLine("Status do pedido atualizado com sucesso.");
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("id nao encontrado");
+                AtualizarStatusPedido();
+            }
+
         }
         private void RemoverPedido()
         {
-            Console.WriteLine("Digite o ID do pedido:");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.WriteLine("Digite o ID do pedido:");
+                int id = int.Parse(Console.ReadLine());
 
-            _gerenciador.RemoverPedido(id);
+                _gerenciador.RemoverPedido(id);
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("id nao encontrado");
+                RemoverPedido();
+            }
+
         }
 
         private void ListarPedidosPorCliente()
@@ -148,11 +171,22 @@ namespace Ecommerce.UI
 
         private void CalcularValorTotalPedido()
         {
-            Console.WriteLine("Digite o ID do pedido:");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.WriteLine("Digite o ID do pedido:");
+                int id = int.Parse(Console.ReadLine());
 
-            decimal valorTotal = _gerenciador.CalcularValorTotalPedido(id);
-            Console.WriteLine($"Valor total do pedido: R$ {valorTotal}");
+                decimal valorTotal = _gerenciador.CalcularValorTotalPedido(id);
+                Console.WriteLine($"Valor total do pedido: R$ {valorTotal}");
+            }
+            catch
+            {
+                Console.Clear();
+
+                Console.WriteLine("id nao encontrado");
+                CalcularValorTotalPedido();
+            }
+
         }
         public void mostrarClientes(List<Pedido> lista)
         {

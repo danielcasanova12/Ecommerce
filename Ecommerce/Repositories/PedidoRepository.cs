@@ -34,7 +34,7 @@ namespace Ecommerce.Repositories
 
                     var id = (int)(ulong)command.ExecuteScalar();
                     pedido.Id = id;
-
+                    Console.WriteLine("o id do seu pedido é :"+ id);
                     foreach (var item in pedido.Itens)
                     {
                         item.Pedido = pedido;
@@ -76,7 +76,7 @@ namespace Ecommerce.Repositories
                     connection.Open();
 
                     // Verifica se existem itens relacionados ao pedido
-                    var queryItens = "SELECT COUNT(*) FROM tb_pedido_itempedido WHERE PedidoId = @Id";
+                    var queryItens = "SELECT COUNT(*) FROM tb_itempedido WHERE PedidoId = @Id";
                     var commandItens = new MySqlCommand(queryItens, connection);
                     commandItens.Parameters.AddWithValue("@Id", id);
                     var count = Convert.ToInt32(commandItens.ExecuteScalar());
@@ -94,6 +94,7 @@ namespace Ecommerce.Repositories
                         command.Parameters.AddWithValue("@Id", id);
 
                         command.ExecuteNonQuery();
+                        Console.WriteLine("Pedido removido");
                     }
                 }
             }
@@ -351,8 +352,29 @@ namespace Ecommerce.Repositories
         //    }
         //}
 
+        public List<Produto> ObterTodosProdutos()
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                connection.Open();
 
-        public Produto ObterProduto(int produtoId)
+                var query = "SELECT * FROM tb_produto";
+                var command = new MySqlCommand(query, connection);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("id: " + (int)reader["ProdutoId"]);
+                        Console.WriteLine("Nome: " + (string)reader["nome"]);
+                        Console.WriteLine("Preco: " + (decimal)reader["preco"]);
+                        Console.WriteLine("-----------------------------------------");
+                    }
+                }
+            }
+            return null;
+        }
+                public Produto ObterProduto(int produtoId)
         {
             using var connection = new MySqlConnection(_connectionString);
             connection.Open();
@@ -362,21 +384,30 @@ namespace Ecommerce.Repositories
             command.Parameters.AddWithValue("@produtoId", produtoId);
 
             using var reader = command.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return new Produto
+                if (reader.Read())
                 {
-                    ProdutoId = produtoId,
-                    Nome = reader.GetString("nome"),
-                    Preco = reader.GetDecimal("preco")
-                };
+                    return new Produto
+                    {
+                        ProdutoId = produtoId,
+                        Nome = reader.GetString("nome"),
+                        Preco = reader.GetDecimal("preco")
+                    };
+                }
+                else
+                {
+                    throw new Exception($"Produto com ID {produtoId} não encontrado.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception($"Produto com ID {produtoId} não encontrado.");
+                Console.WriteLine(ex.Message);
+                return null;
             }
+            
         }
-        private List<ItemPedido> ObterItensPorPedido(int pedidoId)
+            private List<ItemPedido> ObterItensPorPedido(int pedidoId)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
