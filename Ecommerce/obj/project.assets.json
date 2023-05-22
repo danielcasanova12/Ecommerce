@@ -2254,11 +2254,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce\\Ecommerce\\Ecommerce.csproj",
+      "projectUniqueName": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce2\\Ecommerce\\Ecommerce.csproj",
       "projectName": "Ecommerce",
-      "projectPath": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce\\Ecommerce\\Ecommerce.csproj",
+      "projectPath": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce2\\Ecommerce\\Ecommerce.csproj",
       "packagesPath": "C:\\Users\\utfpr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce\\Ecommerce\\obj\\",
+      "outputPath": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce2\\Ecommerce\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\utfpr\\AppData\\Roaming\\NuGet\\NuGet.Config",

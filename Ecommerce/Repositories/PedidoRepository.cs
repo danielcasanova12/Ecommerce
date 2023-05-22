@@ -1,9 +1,11 @@
 ﻿using Ecommerce.Models;
+using Ecommerce.UI;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -89,11 +91,26 @@ namespace Ecommerce.Repositories
                     else
                     {
                         // Se não existirem itens relacionados, executa a exclusão do pedido
-                        var query = "DELETE FROM tb_pedido WHERE PedidoId = @Id";
-                        var command = new MySqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@Id", id);
 
-                        command.ExecuteNonQuery();
+                        
+                        // Verificar se o pedido com o ID existe
+                        var existsQuery = "SELECT COUNT(*) FROM tb_pedido WHERE PedidoId = @Id";
+                        using var existsCommand = new MySqlCommand(existsQuery, connection);
+                        existsCommand.Parameters.AddWithValue("@Id", id);
+
+                        var counts = (long)existsCommand.ExecuteScalar();
+                        if (counts == 0)
+                        {
+                            Console.WriteLine($"Pedido com ID {id} não encontrado.");
+                            return;
+                        }
+
+                        // Excluir o pedido
+                        var deleteQuery = "DELETE FROM tb_pedido WHERE PedidoId = @Id";
+                        using var deleteCommand = new MySqlCommand(deleteQuery, connection);
+                        deleteCommand.Parameters.AddWithValue("@Id", id);
+
+                        deleteCommand.ExecuteNonQuery();
                         Console.WriteLine("Pedido removido");
                     }
                 }
@@ -169,20 +186,42 @@ namespace Ecommerce.Repositories
         public decimal calcularValorTotalDoPedido(int pedidoId)
         {
             decimal valorTotal = 0;
-            using (MySqlConnection conexao = new MySqlConnection(_connectionString))
+            try
             {
-                conexao.Open();
-                MySqlCommand comando = new MySqlCommand("SELECT SUM(ip.quantidade * p.preco) FROM tb_itempedido ip JOIN tb_produto p ON ip.ProdutoId = p.ProdutoId WHERE ip.PedidoId = @PedidoId", conexao);
-                comando.Parameters.AddWithValue("@PedidoId", pedidoId);
-                object resultado = comando.ExecuteScalar();
-                if (resultado != DBNull.Value)
+                using (var connection = new MySqlConnection(_connectionString))
                 {
-                    valorTotal = Convert.ToDecimal(resultado);
+                    connection.Open();
+
+                    // Verificar se o pedido com o ID existe
+                    var existsQuery = "SELECT COUNT(*) FROM tb_pedido WHERE PedidoId = @PedidoId";
+                    using var existsCommand = new MySqlCommand(existsQuery, connection);
+                    existsCommand.Parameters.AddWithValue("@PedidoId", pedidoId);
+
+                    var count = (long)existsCommand.ExecuteScalar();
+                    if (count == 0)
+                    {
+                        Console.WriteLine($"Pedido com ID {pedidoId} não encontrado.");
+                        return valorTotal; // Retorna 0 para indicar que o pedido não foi encontrado
+                    }
+
+                    // Calcular o valor total do pedido
+                    var calcularQuery = "SELECT SUM(ip.quantidade * p.preco) FROM tb_itempedido ip JOIN tb_produto p ON ip.ProdutoId = p.ProdutoId WHERE ip.PedidoId = @PedidoId";
+                    using var calcularCommand = new MySqlCommand(calcularQuery, connection);
+                    calcularCommand.Parameters.AddWithValue("@PedidoId", pedidoId);
+
+                    var resultado = calcularCommand.ExecuteScalar();
+                    if (resultado != DBNull.Value)
+                    {
+                        valorTotal = Convert.ToDecimal(resultado);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             return valorTotal;
         }
-
 
 
         public List<Pedido> ObterTodos()
@@ -190,7 +229,6 @@ namespace Ecommerce.Repositories
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-
                 var query = "SELECT * FROM Pedido";
                 var command = new MySqlCommand(query, connection);
 
@@ -376,16 +414,17 @@ namespace Ecommerce.Repositories
         }
                 public Produto ObterProduto(int produtoId)
         {
-            using var connection = new MySqlConnection(_connectionString);
-            connection.Open();
+            //try
+            //{
+                using var connection = new MySqlConnection(_connectionString);
+                connection.Open();
 
-            var query = "SELECT nome, preco FROM tb_produto WHERE ProdutoId  = @produtoId";
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@produtoId", produtoId);
+                var query = "SELECT nome, preco FROM tb_produto WHERE ProdutoId  = @produtoId";
+                using var command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@produtoId", produtoId);
 
-            using var reader = command.ExecuteReader();
-            try
-            {
+                using var reader = command.ExecuteReader();
+            
                 if (reader.Read())
                 {
                     return new Produto
@@ -399,13 +438,15 @@ namespace Ecommerce.Repositories
                 {
                     throw new Exception($"Produto com ID {produtoId} não encontrado.");
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-            
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //    return null;
+            //}
+
+
         }
             private List<ItemPedido> ObterItensPorPedido(int pedidoId)
         {

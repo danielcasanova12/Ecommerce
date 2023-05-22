@@ -39,6 +39,12 @@ namespace Ecommerce.UI
                 var pedido = _gerenciamentoDePedidos.BuscarPorID(pedidoId);
                 var produto = _gerenciamentoDePedidos.ObterProdutoPorId(produtoId);
 
+                while(pedido == null || produto == null)
+                {
+                    Console.Clear();
+                    Console.WriteLine("algo deu errador");
+                    AdicionarItemAoPedido();
+                }
 
                 var novoItemPedido = new ItemPedido
                 {
