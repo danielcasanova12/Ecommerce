@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5PcKGJPLW+gzY+dSxcnFak8vRjQxY6Gvy/bTpO/aCtqig+1iNznLPmIYeD8eIfOB7AY6heGsHJqCBsH3T6TtYg==",
+  "dgSpecHash": "hFMVNxQTRO3ZIqCSYfDt7TY6uMdXUo43n10YZIqYvDJt+OCwb1zyHng582fk17OMpcDQINZgPv1+pVvRkLhpiQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\utfpr\\Source\\Repos\\Ecommerce2\\Ecommerce\\Ecommerce.csproj",
+  "projectFilePath": "C:\\Users\\utfpr\\source\\repos\\Ecommerce2\\Ecommerce\\Ecommerce.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\utfpr\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",
     "C:\\Users\\utfpr\\.nuget\\packages\\k4os.compression.lz4\\1.3.5\\k4os.compression.lz4.1.3.5.nupkg.sha512",
